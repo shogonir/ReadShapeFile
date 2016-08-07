@@ -215,6 +215,50 @@ class ShapeMainPolygon (ShapeMainRecord) :
         return form.format(self.num_parts, self.num_points)
 
 
+class ShapeIndex :
+    
+    def __init__ (self, fname) :
+        print fname
+        self.fname = fname
+        self.br = BinaryReader(fname)
+        self.header = ShapeMainHeader(self.br)
+        self.header.printHeader()
+        self.records = self.readRecords()
+        self.printRecords()
+
+    def readRecords (self) :
+        records = []
+        length = self.header.file_length - 50
+        while length > 0 :
+            record = Index(self.br)
+            records.append(record)
+            length -= record.length
+        return records
+
+    def printRecords (self) :
+        print '    Records     :'
+        for recordno, record in enumerate(self.records) :
+            print '        ' + str(record)
+            if recordno == 9 :
+                print '        ... there are {0:d} records'.format(len(self.records))
+                break
+        print
+
+
+class Index :
+
+    LENGTH = 4
+    
+    def __init__ (self, br) :
+        self.key = br.readIntAsBig()
+        self.value = br.readIntAsBig()
+        self.length = self.LENGTH
+
+    def __str__ (self) :
+        form = 'Index(key={0:d}, value={1:d})'
+        return form.format(self.key, self.value)
+
+
 class BoundingBox :
 
     LENGTH = 16
@@ -238,7 +282,6 @@ class Point :
 
 
 if __name__ == '__main__' :
-    pp = pprint.PrettyPrinter(indent=4)
     
     dname = '544022'
     files = os.listdir(dname)
@@ -251,3 +294,5 @@ if __name__ == '__main__' :
     for shp_name in shps :
         shp_file = ShapeMain(shp_name)
 
+    for shx_name in shxs :
+        shx_file = ShapeIndex(shx_name)
