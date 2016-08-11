@@ -10,14 +10,15 @@ class PngCreator :
     
     @staticmethod
     def createFromShapeMains (shapes) :
-        ratio = 40000
+        ratio = 10000
         xmin, xmax, ymin, ymax = PngCreator.extractMinMax(shapes)
         width  = int(ratio * (xmax - xmin)) + 1
         height = int(ratio * (ymax - ymin)) + 1
         image  = Image.new('RGB', (width, height), (0x00, 0x00, 0x00))
         approved_types = [ShapeMainRecord.SHAPE_TYPE_POLY_LINE, ShapeMainRecord.SHAPE_TYPE_POLYGON]
         for shape in shapes :
-            color = PngCreator.prefixToColor(shape.fname.split('-')[3])
+            prefix = shape.fname.split('-')[3]
+            color = PngCreator.prefixToColor(prefix)
             if shape.header.shape_type in approved_types :
                 for record in shape.records :
                     for pointno, point in enumerate(record.content.points) :
