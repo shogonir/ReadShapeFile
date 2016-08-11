@@ -10,7 +10,7 @@ class PngCreator :
     
     @staticmethod
     def createFromShapeMains (shapes) :
-        ratio = 10000
+        ratio = 40000
         xmin, xmax, ymin, ymax = PngCreator.extractMinMax(shapes)
         width  = int(ratio * (xmax - xmin)) + 1
         height = int(ratio * (ymax - ymin)) + 1
@@ -19,6 +19,8 @@ class PngCreator :
         for shape in shapes :
             prefix = shape.fname.split('-')[3]
             color = PngCreator.prefixToColor(prefix)
+            if color == None :
+                continue
             if shape.header.shape_type in approved_types :
                 for record in shape.records :
                     for pointno, point in enumerate(record.content.points) :
@@ -34,19 +36,21 @@ class PngCreator :
 
     @staticmethod
     def prefixToColor (prefix) :
-        if 'Rail' in prefix :
-            return (0xFF, 0x00, 0xFF)
-        elif 'Rvr' in prefix :
-            return (0x00, 0xFF, 0xFF)
-        elif 'Adm' in prefix :
+        denied_prefixs = [
+            'Cntr', 'VegeClassL', 'VLine', 'TrfStrct', 'TrfTnnlEnt', 'PwrPlnt', 'Cntr'
+            'PwrTrnsmL', 'WA', 'WL', 'WoodRes', 'SpcfArea', 'AdmArea', 'AdmBdry', 'AdmPt'
+        ]
+        if prefix in denied_prefixs :
+            return None
+        elif 'Rail' in prefix :
             return (0xFF, 0xFF, 0x00)
-        elif 'Cntr' in prefix :
-            return (0x00, 0xFF, 0x00)
-        elif 'Bld' in prefix :
-            return (0xAA, 0xAA, 0x00)
+        elif 'Rvr' in prefix :
+            return (0x00, 0x00, 0xFF)
+        elif prefix == 'BldA' :
+            return (0x00, 0xAA, 0x00)
         elif 'Rd' in prefix :
-            return (0xFF, 0x00, 0x00)
-        return (0xFF, 0xFF, 0xFF)
+            return (0x00, 0xBB, 0xBB)
+        return None
 
     @staticmethod
     def normalizePoint (point, xmin, xmax, ymin, ymax, width, height) :

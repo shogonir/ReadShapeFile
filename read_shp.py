@@ -18,7 +18,12 @@ if __name__ == '__main__' :
         extension = fname.split('.')[1]
         exec('{0:s}s.append(dname + "/" + fname)'.format(extension))
     
-    shapes = [ShapeMain(fname) for fname in shps]
+    denied_prefixs = [
+        'Cntr', 'VegeClassL', 'VLine', 'TrfStrct', 'TrfTnnlEnt', 'PwrPlnt', 'Cntr'
+        'PwrTrnsmL', 'WA', 'WL', 'WoodRes', 'SpcfArea', 'AdmArea', 'AdmBdry', 'AdmPt'
+    ]
+
+    shapes = [ShapeMain(fname) for fname in shps if fname not in denied_prefixs]
 
     PngCreator.createFromShapeMains(shapes)
 
